@@ -1,0 +1,117 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.content {
+  width: 80vw;
+  margin: 0 auto;
+}
+
+header,
+.content {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+header h1 {
+  font-size: 48px;
+}
+
+.content h3 {
+  font-size: 32px;
+  color: green;
+}
+
+#form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+input {
+  border: none;
+  border-radius: 1rem;
+  background: cornflowerblue;
+  padding: 0.8rem;
+  width: 15rem;
+  margin: 1rem;
+}
+
+input:focus {
+  outline: none;
+}
+
+.button {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.button button {
+  border: none;
+  background: cornflowerblue;
+  padding: 8px 20px;
+  color: white;
+  border-radius: 5px;
+}
+
+#expenses {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.expense {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.expense h4 {
+  font-size: 1rem;
+}
+
+.expense-name {
+  width: 15rem;
+  text-align: center;
+  position: relative;
+}
+
+.expense-date {
+  width: 15rem;
+  text-align: center;
+  position: relative;
+  left: 1.5rem;
+}
+
+.expense-amount {
+  width: 15rem;
+  text-align: center;
+  position: relative;
+}
+
+.item {
+  display: flex;
+  justify-content: center;
+  background: grey;
+}
+
+.item p {
+  margin: 0 10rem;
+}
+
+.edit-input {
+}
+
+.hide {
+  display: none;
+}
