@@ -112,6 +112,23 @@ input:focus {
 .edit-input {
 }
 
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.modal > div {
+  width: 60rem;
+  position: relative;
+  margin: 10% auto;
+  padding: 1rem 2rem;
+  background: red;
+}
+
 .hide {
   display: none;
 }

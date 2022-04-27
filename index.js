@@ -5,15 +5,17 @@ const formAmount = document.getElementById("amount");
 const form = document.getElementById("form");
 const expenses = document.querySelector("#expenses");
 let items = [];
+let labels = [];
 
-function createButtonsHandler() {
-  const editBtn = document.createElement("button");
-  editBtn.classList.add("edit-btn");
-
-  return editBtn;
+function writeListItemLabels(label, color) {
+  labels.push({
+    label,
+    color,
+  });
+  return labels;
 }
 
-function writeItemObj(name, date, amount, id) {
+function writeListItemObject(name, date, amount, id) {
   items.push({
     name,
     date,
@@ -24,69 +26,91 @@ function writeItemObj(name, date, amount, id) {
 }
 
 function writeToShow(name, date, amount, id) {
-  expenses.innerHTML += `
-<div class="expense" id="${id}">
-  <div class="edit-input hide">
-    <input type="text" class="edit-input-list-btn"/>
-    <button class="edit-to-list-btn">Salvar</button>
-  </div>
-  <div class="item">
-      <div class="expense-name">
-        <h4>${name}</h4>
-      </div>
-
-      <div class="expense-date">
-        <h4>${date}</h4>
-      </div>
-
-      <div class="expense-amount">
-        <h4>R$ ${amount}</h4>
-      </div> 
-      <div class="expense-labels">
-        <h4>Food</h4>
-      </div> 
-    <button class="del-btn">Deletar</button>
-    <button class="edit-btn">Editar</button>
-  </div>
+  expenses.innerHTML += `<div class="expense" id="${id}">
+<div class="edit-input hide">
+<input type="text" class="edit-input-list-btn"/>
+<button class="edit-to-list-btn">Salvar</button>
+</div>
+<div class="item">
+<div class="expense-name">
+<h4>${name}</h4>
+</div>
+<div class="expense-amount">
+<h4>R$ ${amount}</h4>
+</div> 
+<div class="expense-date">
+<h4>${date}</h4>
+</div>
+<select class="expense-labels">
+<option class="item-label">Food</option>
+<input class="insert-label" type="text" placeholder="new label"/>
+<button class="add-new-label">add</button>
+<button class="del-new-label">add</button>
+</select> 
+<button class="del-btn">Deletar</button>
+<button class="edit-btn">Editar</button>
+</div>
 </div>`;
+}
+
+function addNewLabelToList() {
+  const getItems = document.querySelector("#expenses");
+
+  getItems.addEventListener("click", (event) => {
+    const clickedElement = event.target;
+    if (clickedElement.className === "add-new-label") {
+      let getInputValue = clickedElement.previousElementSibling.value;
+      let newOption = new Option(getInputValue, getInputValue);
+
+      clickedElement.parentNode
+        .querySelector(".expense-labels")
+        .appendChild(newOption);
+      clickedElement.previousElementSibling.value = "";
+    }
+  });
+
+  getItems.addEventListener("click", (event) => {
+    const clickedElement = event.target;
+    if (clickedElement.className === "del-new-label") {
+      //let getInputValue = clickedElement.previousElementSibling.previousElementSibling.value;
+      //let newOption = new Option(getInputValue, getInputValue);
+
+      console.log(
+        clickedElement.previousElementSibling.previousElementSibling.value
+      );
+
+      //clickedElement.parentNode
+      //  .querySelector(".expense-labels")
+      //  .appendChild(newOption);
+      //clickedElement.previousElementSibling.previousElementSibling.value = "";
+    }
+  });
 }
 
 function editItemFromList() {
   const getItems = document.querySelector("#expenses");
 
   getItems.addEventListener("click", (event) => {
-    //getItems.innerHTML = `
-    //<input type="text" class="edit-from-list"/>
-    //<button class="edit-from-list-btn">Salvar</button>
-
-    //`;
-    const getButton = event.target;
-    if (getButton.className === "edit-btn") {
-      getButton.parentNode.classList.add("hide");
-      getButton.parentNode.previousElementSibling.classList.remove("hide");
-
-      //let newExpenseName = document.querySelector(".edit-input").value;
-      //let index = items.findIndex(
-      //  (element) => element.id === getButton.previousElementSibling.id
-      //);
-      //items[index].name = newExpenseName;
+    const clickedElement = event.target;
+    if (clickedElement.className === "edit-btn") {
+      clickedElement.parentNode.classList.add("hide");
+      clickedElement.parentNode.previousElementSibling.classList.remove("hide");
     }
 
-    if (getButton.className === "edit-to-list-btn") {
-      getButton.parentNode.nextElementSibling.classList.remove("hide");
-      getButton.parentNode.classList.add("hide");
+    if (clickedElement.className === "edit-to-list-btn") {
+      clickedElement.parentNode.nextElementSibling.classList.remove("hide");
+      clickedElement.parentNode.classList.add("hide");
 
-      let newExpenseName = getButton.parentNode.firstElementChild.value;
+      let newExpenseName = clickedElement.parentNode.firstElementChild.value;
 
-      console.log(getButton.parentNode.nextElementSibling.firstElementChild);
-      getButton.parentNode.nextElementSibling.firstElementChild.innerHTML = `
+      clickedElement.parentNode.nextElementSibling.firstElementChild.innerHTML = `
         <h4>${newExpenseName}</h4>
       `;
 
-      getButton.parentNode.firstElementChild.value = "";
+      clickedElement.parentNode.firstElementChild.value = "";
 
       let index = items.findIndex(
-        (element) => element.id === getButton.parentNode.parentNode.id
+        (element) => element.id === clickedElement.parentNode.parentNode.id
       );
       items[index].name = newExpenseName;
     }
@@ -97,17 +121,17 @@ function deleteItemFromList() {
   const getItems = document.querySelector("#expenses");
 
   getItems.addEventListener("click", (event) => {
-    const getButton = event.target;
-    if (getButton.className === "del-btn") {
+    const clickedElement = event.target;
+    if (clickedElement.className === "del-btn") {
       let index = items.findIndex(
-        (element) => element.id === getButton.parentNode.id
+        (element) => element.id === clickedElement.parentNode.id
       );
 
-      console.log(getButton.parentNode);
-      console.log(getButton.parentNode.parentNode);
+      console.log(clickedElement.parentNode);
+      console.log(clickedElement.parentNode.parentNode);
 
       items.splice(index, 1);
-      getButton.parentNode.parentNode.remove();
+      clickedElement.parentNode.parentNode.remove();
     }
   });
 }
@@ -128,14 +152,16 @@ function getFormValues(e) {
     return alert("Insert a valid number");
   }
 
+  // Generate random ID to each List Item
   let id = "id" + Math.random().toString(16).slice(2);
 
-  writeItemObj(name, date, amount, id);
+  writeListItemObject(name, date, amount, id);
   writeToShow(name, date, amount, id);
 
   form.reset();
 }
 
+addNewLabelToList();
 editItemFromList();
 deleteItemFromList();
 submitBtn.addEventListener("click", getFormValues);
