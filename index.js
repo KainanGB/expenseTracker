@@ -4,6 +4,9 @@ const formDate = document.getElementById("date");
 const formAmount = document.getElementById("amount");
 const form = document.getElementById("form");
 const expenses = document.querySelector("#expenses");
+const modal = document.querySelector(".modal");
+const modalContent = document.querySelector(".modal-content");
+
 let items = [];
 let labels = [];
 
@@ -15,48 +18,94 @@ function writeListItemLabels(label, color) {
   return labels;
 }
 
-function writeListItemObject(name, date, amount, id) {
+function writeListItemObject(item) {
+  const { name, date, amount, color, id } = item;
+  console.log(name, date, amount, color);
   items.push({
     name,
     date,
     amount,
     id,
+    label: { color: "red", label: ["comida", "carro"] },
   });
   return items;
 }
 
-function writeToShow(name, date, amount, id) {
+function writeToShow(item) {
+  const { name, date, amount, id, color } = item;
+
   expenses.innerHTML += `<div class="expense" id="${id}">
-<div class="edit-input hide">
-<input type="text" class="edit-input-list-btn"/>
-<button class="edit-to-list-btn">Salvar</button>
-</div>
-<div class="item">
-<div class="expense-name">
-<h4>${name}</h4>
-</div>
-<div class="expense-amount">
-<h4>R$ ${amount}</h4>
-</div> 
-<div class="expense-date">
-<h4>${date}</h4>
-</div>
-<select class="expense-labels">
-<option class="item-label">Food</option>
-<input class="insert-label" type="text" placeholder="new label"/>
-<button class="add-new-label">add</button>
-<button class="del-new-label">add</button>
-</select> 
-<button class="del-btn">Deletar</button>
-<button class="edit-btn">Editar</button>
-</div>
-</div>`;
+  <div class="item">
+    <div class="expense-name">
+      <h4>${name}</h4>
+      </div>
+      <div class="expense-amount">
+      <h4>R$ ${amount}</h4>
+      </div> 
+      <div class="expense-date">
+      <h4>${date}</h4>
+    </div>
+    <button class="del-btn">Deletar</button>
+    <button class="open-modal">Editar</button>
+    </div>
+  </div>`;
+}
+
+function writeItemObjectToShow(obj) {
+  let { name, date, amount, id } = obj;
+
+  modalContent.innerHTML += `
+  <div class="modal-wrapper">
+    <div class="expense-item" id=${id}>
+      <div class="expense__name">
+      <p>Name:</p>
+      <span class="dClickName">${name}</span>
+      </div>
+
+      <div class="expense__amount">
+      <p>Amount:</p>
+      <span class="dClickAmount" >${amount}</span>
+      </div>
+
+  
+      <div class="expense__date">
+      <p>Date:</p>
+      <span class="dClickDate"">${date}</span>
+      </div>
+
+      <button class="save-changes">Save</button>
+   
+    </div>
+
+
+    <div class="expense-labels">
+      <select class="expense-labels">
+        <option class="item-label"></option>
+        <input class="insert-label" type="text" placeholder="new label"/>
+        <button class="add-new-label">Add</button>
+        <button class="del-new-label">Delete</button>
+      </select> 
+    </div>
+  </div>
+  `;
+
+  return modalContent;
+}
+
+function hideModal() {
+  const closeModal = document.querySelector(".close-modal");
+
+  modal.addEventListener("click", (event) => {
+    let clickedElement = event.target;
+    if (clickedElement.className === closeModal.className) {
+      modalContent.innerHTML = ``;
+      modal.classList.toggle("hide");
+    }
+  });
 }
 
 function addNewLabelToList() {
-  const getItems = document.querySelector("#expenses");
-
-  getItems.addEventListener("click", (event) => {
+  modalContent.addEventListener("click", (event) => {
     const clickedElement = event.target;
     if (clickedElement.className === "add-new-label") {
       let getInputValue = clickedElement.previousElementSibling.value;
@@ -69,8 +118,9 @@ function addNewLabelToList() {
     }
   });
 
-  getItems.addEventListener("click", (event) => {
+  modalContent.addEventListener("click", (event) => {
     const clickedElement = event.target;
+
     if (clickedElement.className === "del-new-label") {
       //let getInputValue = clickedElement.previousElementSibling.previousElementSibling.value;
       //let newOption = new Option(getInputValue, getInputValue);
@@ -87,40 +137,29 @@ function addNewLabelToList() {
   });
 }
 
-function editItemFromList() {
-  const getItems = document.querySelector("#expenses");
-
-  getItems.addEventListener("click", (event) => {
+function sendItemObjectToModal() {
+  expenses.addEventListener("click", (event) => {
     const clickedElement = event.target;
-    if (clickedElement.className === "edit-btn") {
-      clickedElement.parentNode.classList.add("hide");
-      clickedElement.parentNode.previousElementSibling.classList.remove("hide");
-    }
 
-    if (clickedElement.className === "edit-to-list-btn") {
-      clickedElement.parentNode.nextElementSibling.classList.remove("hide");
-      clickedElement.parentNode.classList.add("hide");
-
-      let newExpenseName = clickedElement.parentNode.firstElementChild.value;
-
-      clickedElement.parentNode.nextElementSibling.firstElementChild.innerHTML = `
-        <h4>${newExpenseName}</h4>
-      `;
-
-      clickedElement.parentNode.firstElementChild.value = "";
+    if (clickedElement.className === "open-modal") {
+      modal.classList.toggle("hide");
 
       let index = items.findIndex(
         (element) => element.id === clickedElement.parentNode.parentNode.id
       );
-      items[index].name = newExpenseName;
+      writeItemObjectToShow(items[index]);
+
+      //let toggleLabelButton = document.querySelector(".edit-btn");
+      //toggleLabelButton.classList.remove("hide");
+
+      //clickedElement.parentNode.classList.add("hide");
+      //clickedElement.parentNode.previousElementSibling.classList.remove("hide");
     }
   });
 }
 
 function deleteItemFromList() {
-  const getItems = document.querySelector("#expenses");
-
-  getItems.addEventListener("click", (event) => {
+  expenses.addEventListener("click", (event) => {
     const clickedElement = event.target;
     if (clickedElement.className === "del-btn") {
       let index = items.findIndex(
@@ -136,11 +175,85 @@ function deleteItemFromList() {
   });
 }
 
+function doubleClickToEdit() {
+  modalContent.addEventListener("dblclick", (event) => {
+    const clickedElement = event.target;
+    const storeOldElement = event.target.parentNode.parentNode;
+
+    let index = items.findIndex((element) => element.id === storeOldElement.id);
+
+    if (index >= 0) {
+      let { name, date, amount } = items[index];
+
+      if (clickedElement.className === "dClickName") {
+        const getParentElement = clickedElement.parentNode;
+        getParentElement.innerHTML = `
+        <input type="text"  id="input-value" value="${name}">
+        `;
+      }
+
+      if (clickedElement.className === "dClickDate") {
+        const getParentElement = clickedElement.parentNode;
+        getParentElement.innerHTML = `
+        <input type="text" id="input-date" value="${date}">
+        `;
+      }
+
+      if (clickedElement.className === "dClickAmount") {
+        const getParentElement = clickedElement.parentNode;
+        getParentElement.innerHTML = `
+        <input type="text" id="input-amount" value="${amount}">
+        `;
+      }
+    }
+  });
+
+  modalContent.addEventListener("click", (event) => {
+    const clickedElement = event.target;
+    const storeOldElement = event.target.parentNode.parentNode;
+
+    if (clickedElement.className === "save-changes") {
+      let nameValue;
+      let dateValue;
+      let amountValue;
+      let findIndex = items.findIndex(
+        (element) => element.id === clickedElement.parentNode.id
+      );
+
+      if (clickedElement.parentNode.querySelector(".expense__name input")) {
+        nameValue = clickedElement.parentNode.querySelector(
+          ".expense__name input"
+        ).value;
+      }
+
+      if (clickedElement.parentNode.querySelector(".expense__date input")) {
+        dateValue = clickedElement.parentNode.querySelector(
+          ".expense__date input"
+        ).value;
+      }
+
+      if (clickedElement.parentNode.querySelector(".expense__amount input")) {
+        amountValue = clickedElement.parentNode.querySelector(
+          ".expense__amount input"
+        ).value;
+      }
+      console.log(items[findIndex].name);
+
+      if (nameValue) items[findIndex].name = nameValue;
+      if (dateValue) items[findIndex].name = dateValue;
+      if (amountValue) items[findIndex].name = amountValue;
+
+      console.log(items);
+    }
+  });
+}
+
 function getFormValues(e) {
   e.preventDefault();
   const name = formName.value;
-  const date = formDate.value;
+  let date = formDate.value;
   const amount = formAmount.value;
+  const color = "red";
 
   if (name == "") {
     form.reset();
@@ -155,13 +268,25 @@ function getFormValues(e) {
   // Generate random ID to each List Item
   let id = "id" + Math.random().toString(16).slice(2);
 
-  writeListItemObject(name, date, amount, id);
-  writeToShow(name, date, amount, id);
+  if (date === "") date = "00-00-0000";
+
+  const itemObject = {
+    name,
+    date,
+    amount,
+    color,
+    id,
+  };
+
+  writeListItemObject(itemObject);
+  writeToShow(itemObject);
 
   form.reset();
 }
 
+doubleClickToEdit();
+hideModal();
 addNewLabelToList();
-editItemFromList();
+sendItemObjectToModal();
 deleteItemFromList();
 submitBtn.addEventListener("click", getFormValues);
