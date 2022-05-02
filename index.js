@@ -18,41 +18,33 @@ function writeListItemLabels(label, color) {
   return labels;
 }
 
-function writeListItemObject(item) {
-  const { name, date, amount, color, id } = item;
-  console.log(name, date, amount, color);
-  items.push({
-    name,
-    date,
-    amount,
-    id,
-    label: { color: "red", label: ["comida", "carro"] },
-  });
-  return items;
-}
+function writeToShow(items) {
+  expenses.innerHTML = "";
 
-function writeToShow(item) {
-  const { name, date, amount, id, color } = item;
-
-  expenses.innerHTML += `<div class="expense" id="${id}">
+  items.forEach((item) => {
+    expenses.innerHTML += `
+<div class="expense" id="${item.info.id}">
   <div class="item">
     <div class="expense-name">
-      <h4>${name}</h4>
+      <h4>${item.info.name}</h4>
       </div>
       <div class="expense-amount">
-      <h4>R$ ${amount}</h4>
-      </div> 
+      <h4>R$ ${item.info.amount}</h4>
+      </div>
       <div class="expense-date">
-      <h4>${date}</h4>
+      <h4>${item.info.date}</h4>
     </div>
-    <button class="del-btn">Deletar</button>
-    <button class="open-modal">Editar</button>
-    </div>
-  </div>`;
+  <button class="del-btn">Deletar</button>
+  <button class="open-modal">Editar</button>
+  </div>
+</div>`;
+  });
 }
 
-function writeItemObjectToShow(obj) {
+function renderItemOnModal(obj) {
   let { name, date, amount, id } = obj;
+
+  console.log(obj);
 
   modalContent.innerHTML += `
   <div class="modal-wrapper">
@@ -144,10 +136,24 @@ function sendItemObjectToModal() {
     if (clickedElement.className === "open-modal") {
       modal.classList.toggle("hide");
 
-      let index = items.findIndex(
-        (element) => element.id === clickedElement.parentNode.parentNode.id
+      let itemId = clickedElement.parentNode.parentNode.id;
+
+      //let index = items.findIndex((element) => element.info.id === itemId);
+
+      //console.log(index);
+      //console.log(items);
+
+      //console.log(items.findIndex((element) => element.info.id === "0"));
+
+      items.forEach((item) =>
+        item.info.id === itemId
+          ? renderItemOnModal(item.info)
+          : console.log("nop")
       );
-      writeItemObjectToShow(items[index]);
+
+      //renderItemOnModal(items.info.id[index]);
+
+      //console.log(teste);
 
       //let toggleLabelButton = document.querySelector(".edit-btn");
       //toggleLabelButton.classList.remove("hide");
@@ -270,23 +276,28 @@ function getFormValues(e) {
 
   if (date === "") date = "00-00-0000";
 
-  const itemObject = {
-    name,
-    date,
-    amount,
-    color,
-    id,
+  const newItem = {
+    info: {
+      name,
+      date,
+      amount,
+      id,
+      label: {
+        color: "red",
+        labels: ["comida", "carro"],
+      },
+    },
   };
 
-  writeListItemObject(itemObject);
-  writeToShow(itemObject);
+  items.push(newItem);
+  writeToShow(items);
 
   form.reset();
 }
 
+sendItemObjectToModal();
 doubleClickToEdit();
 hideModal();
 addNewLabelToList();
-sendItemObjectToModal();
 deleteItemFromList();
 submitBtn.addEventListener("click", getFormValues);
