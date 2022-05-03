@@ -22,21 +22,23 @@ function writeToShow(items) {
   expenses.innerHTML = "";
 
   items.forEach((item) => {
+    const { id, name, amount, date } = item.info;
+
     expenses.innerHTML += `
-<div class="expense" id="${item.info.id}">
-  <div class="item">
-    <div class="expense-name">
-      <h4>${item.info.name}</h4>
-      </div>
-      <div class="expense-amount">
-      <h4>R$ ${item.info.amount}</h4>
-      </div>
-      <div class="expense-date">
-      <h4>${item.info.date}</h4>
-    </div>
-  <button class="del-btn">Deletar</button>
-  <button class="open-modal">Editar</button>
-  </div>
+<div class="expense" id="${id}">
+<div class="item">
+<div class="expense-name">
+<h4>${name}</h4>
+</div>
+<div class="expense-amount">
+<h4>R$ ${amount}</h4>
+</div>
+<div class="expense-date">
+<h4>${date}</h4>
+</div>
+<button class="del-btn">Deletar</button>
+<button class="open-modal">Editar</button>
+</div>
 </div>`;
   });
 }
@@ -69,7 +71,6 @@ function renderItemOnModal(obj) {
    
     </div>
 
-
     <div class="expense-labels">
       <select class="expense-labels">
         <option class="item-label"></option>
@@ -92,6 +93,9 @@ function hideModal() {
     if (clickedElement.className === closeModal.className) {
       modalContent.innerHTML = ``;
       modal.classList.toggle("hide");
+    }
+    if (clickedElement.className === "save-changes") {
+      modalContent.innerHTML = ``;
     }
   });
 }
@@ -138,28 +142,11 @@ function sendItemObjectToModal() {
 
       let itemId = clickedElement.parentNode.parentNode.id;
 
-      //let index = items.findIndex((element) => element.info.id === itemId);
-
-      //console.log(index);
-      //console.log(items);
-
-      //console.log(items.findIndex((element) => element.info.id === "0"));
-
       items.forEach((item) =>
         item.info.id === itemId
           ? renderItemOnModal(item.info)
           : console.log("nop")
       );
-
-      //renderItemOnModal(items.info.id[index]);
-
-      //console.log(teste);
-
-      //let toggleLabelButton = document.querySelector(".edit-btn");
-      //toggleLabelButton.classList.remove("hide");
-
-      //clickedElement.parentNode.classList.add("hide");
-      //clickedElement.parentNode.previousElementSibling.classList.remove("hide");
     }
   });
 }
@@ -184,47 +171,49 @@ function deleteItemFromList() {
 function doubleClickToEdit() {
   modalContent.addEventListener("dblclick", (event) => {
     const clickedElement = event.target;
-    const storeOldElement = event.target.parentNode.parentNode;
+    const storeOldElement = event.target.parentNode.parentNode.id;
 
-    let index = items.findIndex((element) => element.id === storeOldElement.id);
+    let itemObject;
 
-    if (index >= 0) {
-      let { name, date, amount } = items[index];
+    items.forEach((item) =>
+      item.info.id === storeOldElement
+        ? (itemObject = item.info)
+        : console.log("nop")
+    );
 
-      if (clickedElement.className === "dClickName") {
-        const getParentElement = clickedElement.parentNode;
-        getParentElement.innerHTML = `
+    let { name, date, amount } = itemObject;
+
+    if (clickedElement.className === "dClickName") {
+      const getParentElement = clickedElement.parentNode;
+      getParentElement.innerHTML = `
         <input type="text"  id="input-value" value="${name}">
         `;
-      }
+    }
 
-      if (clickedElement.className === "dClickDate") {
-        const getParentElement = clickedElement.parentNode;
-        getParentElement.innerHTML = `
+    if (clickedElement.className === "dClickDate") {
+      const getParentElement = clickedElement.parentNode;
+      getParentElement.innerHTML = `
         <input type="text" id="input-date" value="${date}">
         `;
-      }
+    }
 
-      if (clickedElement.className === "dClickAmount") {
-        const getParentElement = clickedElement.parentNode;
-        getParentElement.innerHTML = `
+    if (clickedElement.className === "dClickAmount") {
+      const getParentElement = clickedElement.parentNode;
+      getParentElement.innerHTML = `
         <input type="text" id="input-amount" value="${amount}">
         `;
-      }
     }
   });
 
+  // GET VALUES FROM ITEM TO SHOW ON AS A DEFAULT IN EDIT INPUT
   modalContent.addEventListener("click", (event) => {
     const clickedElement = event.target;
-    const storeOldElement = event.target.parentNode.parentNode;
+    const storeOldElement = event.target.parentNode;
 
     if (clickedElement.className === "save-changes") {
       let nameValue;
       let dateValue;
       let amountValue;
-      let findIndex = items.findIndex(
-        (element) => element.id === clickedElement.parentNode.id
-      );
 
       if (clickedElement.parentNode.querySelector(".expense__name input")) {
         nameValue = clickedElement.parentNode.querySelector(
@@ -236,6 +225,7 @@ function doubleClickToEdit() {
         dateValue = clickedElement.parentNode.querySelector(
           ".expense__date input"
         ).value;
+      } else {
       }
 
       if (clickedElement.parentNode.querySelector(".expense__amount input")) {
@@ -243,13 +233,17 @@ function doubleClickToEdit() {
           ".expense__amount input"
         ).value;
       }
-      console.log(items[findIndex].name);
 
-      if (nameValue) items[findIndex].name = nameValue;
-      if (dateValue) items[findIndex].name = dateValue;
-      if (amountValue) items[findIndex].name = amountValue;
+      items.forEach((item) => {
+        if (item.info.id === storeOldElement.id) {
+          if (nameValue) item.info.name = nameValue;
+          if (amountValue) item.info.amount = amountValue;
+          if (dateValue) item.info.date = dateValue;
+        } else console.log("nop");
+      });
 
-      console.log(items);
+      modal.classList.toggle("hide");
+      writeToShow(items);
     }
   });
 }
